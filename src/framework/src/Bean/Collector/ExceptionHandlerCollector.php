@@ -32,10 +32,25 @@ class ExceptionHandlerCollector implements CollectorInterface
     {
         if ($objectAnnotation instanceof Handler) {
             $exceptionClass = $objectAnnotation->getException();
-            self::$handlers[$exceptionClass] = [
+
+            $handler = [
+                $exceptionClass,
                 $className,
                 $methodName
             ];
+
+            if (self::$handlers) {
+                $arr = self::$handlers;
+                $exceptionClassInstance = new $exceptionClass;
+                foreach ($arr as $index => $row) {
+                    if ($exceptionClassInstance instanceof $row[0]) {
+                        array_splice(self::$handlers, $index, 0, [$handler]);
+                        return;
+                    }
+                }
+            }
+
+            array_push(self::$handlers, $handler);
         }
     }
 
